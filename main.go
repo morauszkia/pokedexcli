@@ -17,7 +17,7 @@ func main() {
 		commandStr := words[0]
 		command := commands[commandStr]
 		if command.callback == nil  {
-			fmt.Print("Unknown command\n")
+			fmt.Print("Unknown command! Type 'help' to list available commands.\n")
 			continue
 		}
 		command.callback()

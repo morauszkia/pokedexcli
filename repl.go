@@ -17,9 +17,19 @@ func cleanInput(text string) []string {
 	return filteredWords
 }
 
+var commands map[string]cliCommand
+
 func commandExit() error {
 	fmt.Print("Closing the Pokedex... Goodbye!\n")
 	os.Exit(0)
+	return nil
+}
+
+func commandHelp() error {
+	fmt.Print("Welcome to the Pokedex!\nUsage:\n\n")
+	for _, commandStruct := range commands {
+		fmt.Printf("%s: %s\n", commandStruct.name, commandStruct.description)
+	}
 	return nil
 }
 
@@ -29,10 +39,16 @@ type cliCommand struct {
 	callback	func() error
 }
 
-var commands = map[string]cliCommand{
-	"exit": {
+func init() {
+	commands = make(map[string]cliCommand)
+	commands["help"] = cliCommand{
+		name:			"help",
+		description: 	"Lists available commands",
+		callback: 		commandHelp,
+	}
+	commands["exit"] = cliCommand{
 		name: 			"exit",
 		description:	"Exits the Pokedex",
 		callback:		commandExit,
-	},
+	}
 }
