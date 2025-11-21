@@ -15,7 +15,12 @@ func main() {
 		input := s.Text()
 		words := cleanInput(input)
 		commandStr := words[0]
-		fmt.Printf("Your command was: %s\n", commandStr)
+		command := commands[commandStr]
+		if command.callback == nil  {
+			fmt.Print("Unknown command\n")
+			continue
+		}
+		command.callback()
 	}
 }
 

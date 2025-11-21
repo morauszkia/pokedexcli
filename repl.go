@@ -1,6 +1,10 @@
 package main
 
-import "strings"
+import (
+	"fmt"
+	"os"
+	"strings"
+)
 
 func cleanInput(text string) []string {
 	words := strings.Split(strings.ToLower(text), " ")
@@ -11,4 +15,24 @@ func cleanInput(text string) []string {
 		}
 	}
 	return filteredWords
+}
+
+func commandExit() error {
+	fmt.Print("Closing the Pokedex... Goodbye!\n")
+	os.Exit(0)
+	return nil
+}
+
+type cliCommand struct {
+	name		string
+	description	string
+	callback	func() error
+}
+
+var commands = map[string]cliCommand{
+	"exit": {
+		name: 			"exit",
+		description:	"Exits the Pokedex",
+		callback:		commandExit,
+	},
 }
