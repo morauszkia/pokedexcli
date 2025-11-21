@@ -2,35 +2,42 @@ package main
 
 import (
 	"fmt"
+	"bufio"
 	"os"
 	"strings"
 )
 
-func cleanInput(text string) []string {
-	words := strings.Split(strings.ToLower(text), " ")
-	var filteredWords []string 
-	for _, word := range words {
-		if word != "" {
-			filteredWords = append(filteredWords, word)
+func startREPL() {
+	s := bufio.NewScanner(os.Stdin)
+
+	for {
+		fmt.Print("Pokedex > ")
+		s.Scan()
+
+		words := cleanInput(s.Text())
+		if len(words) == 0 {
+			fmt.Println("Please enter command")
+			continue
 		}
+
+		commandStr := words[0]
+		command := getCommands()[commandStr]
+		if command.callback == nil  {
+			fmt.Print("Unknown command! Type 'help' to list available commands.\n")
+			continue
+		}
+		
+		err := command.callback()
+		if err != nil {
+			fmt.Println(err)
+		}
+		continue
 	}
-	return filteredWords
 }
 
-var commands map[string]cliCommand
-
-func commandExit() error {
-	fmt.Print("Closing the Pokedex... Goodbye!\n")
-	os.Exit(0)
-	return nil
-}
-
-func commandHelp() error {
-	fmt.Print("Welcome to the Pokedex!\nUsage:\n\n")
-	for _, commandStruct := range commands {
-		fmt.Printf("%s: %s\n", commandStruct.name, commandStruct.description)
-	}
-	return nil
+func cleanInput(text string) []string {
+	words := strings.Fields(strings.ToLower(text))
+	return words
 }
 
 type cliCommand struct {
@@ -39,16 +46,17 @@ type cliCommand struct {
 	callback	func() error
 }
 
-func init() {
-	commands = make(map[string]cliCommand)
-	commands["help"] = cliCommand{
-		name:			"help",
-		description: 	"Lists available commands",
-		callback: 		commandHelp,
-	}
-	commands["exit"] = cliCommand{
-		name: 			"exit",
-		description:	"Exits the Pokedex",
-		callback:		commandExit,
+func getCommands() map[string]cliCommand {
+	return map[string]cliCommand{
+		"help": {
+			name:			"help",
+			description: 	"Lists available commands",
+			callback: 		commandHelp,
+		},
+		"exit": {
+			name: 			"exit",
+			description:	"Exits the Pokedex",
+			callback:		commandExit,
+		},
 	}
 }

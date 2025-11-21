@@ -1,26 +1,6 @@
 package main
 
-import (
-	"fmt"
-	"bufio"
-	"os"
-)
-
 func main() {
-	s := bufio.NewScanner(os.Stdin)
-
-	for {
-		fmt.Print("Pokedex > ")
-		s.Scan()
-		input := s.Text()
-		words := cleanInput(input)
-		commandStr := words[0]
-		command := commands[commandStr]
-		if command.callback == nil  {
-			fmt.Print("Unknown command! Type 'help' to list available commands.\n")
-			continue
-		}
-		command.callback()
-	}
+	startREPL()
 }
 
