@@ -5,10 +5,14 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"time"
+
+	"github.com/morauszkia/pokedexcli/internal/pokecache"
 )
 
 type Client struct {
 	client 		*http.Client
+	cache		*pokecache.Cache
 	baseURL		string	
 }
 
@@ -19,7 +23,16 @@ func (c *Client) GetLocationAreas(url string) (LocationAreasList, error) {
 	} else {
 		fullURL = url
 	}
-	
+
+	cachedData, ok := c.cache.Get(fullURL)
+	if ok {
+		var locationAreasList LocationAreasList
+		if err := json.Unmarshal(cachedData, &locationAreasList); err != nil {
+			return LocationAreasList{}, err
+		}
+		return locationAreasList, nil
+	}
+
 	res, err := c.client.Get(fullURL)
 	if err != nil {
 		return LocationAreasList{}, err
@@ -39,12 +52,14 @@ func (c *Client) GetLocationAreas(url string) (LocationAreasList, error) {
 	if err := json.Unmarshal(data, &locationAreasList); err != nil {
 		return LocationAreasList{}, err
 	}
+	c.cache.Add(fullURL, data)
 	return locationAreasList, nil
 }
 
-func NewClient () *Client {
+func NewClient (cacheInterval time.Duration) *Client {
 	client := Client{
 		client: &http.Client{},
+		cache: pokecache.NewCache(cacheInterval),
 		baseURL: "https://pokeapi.co/api/v2",
 	}
 	return &client
