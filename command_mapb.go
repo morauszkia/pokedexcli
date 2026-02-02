@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-func commandMapb(c *Config) error {
+func commandMapb(c *Config, args ...string) error {
 	var locationAreasURL string
 	if c.prev == nil {
 		fmt.Println("you're on the first page")

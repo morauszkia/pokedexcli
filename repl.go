@@ -1,8 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"bufio"
+	"fmt"
 	"os"
 	"strings"
 )
@@ -22,13 +22,18 @@ func startREPL() {
 		}
 
 		commandStr := words[0]
-		command := getCommands()[commandStr]
-		if command.callback == nil  {
+		args := []string{}
+		if len(words) > 1 {
+			args = words[1:]
+		}
+
+		command, exists := getCommands()[commandStr]
+		if !exists  {
 			fmt.Print("Unknown command! Type 'help' to list available commands.\n")
 			continue
 		}
 		
-		err := command.callback(&config)
+		err := command.callback(&config, args...)
 		if err != nil {
 			fmt.Println(err)
 		}

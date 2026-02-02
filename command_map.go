@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-func commandMap(c *Config) error {
+func commandMap(c *Config, args ...string) error {
 	var locationAreasURL string
 	if c.next == nil {
 		locationAreasURL = ""
