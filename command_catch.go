@@ -25,6 +25,7 @@ func commandCatch(c *Config, args ...string) error {
 	if isCatchSuccessful(pokemon) {
 		c.pokedex[pokemonName] = pokemon
 		fmt.Printf("%s was caught!\n", pokemonName)
+		fmt.Printf("%s added to your Pokedex. You can now inspect it.\n", pokemonName)
 	} else {
 		fmt.Printf("%s escaped!\n", pokemonName)
 	}
