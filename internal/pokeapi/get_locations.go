@@ -1,11 +1,6 @@
 package pokeapi
 
-import (
-	"encoding/json"
-	"fmt"
-	"io"
-	"net/http"
-)
+import "encoding/json"
 
 func (c *Client) GetLocationAreas(url string) (LocationAreasList, error) {
 	var fullURL string
@@ -15,26 +10,7 @@ func (c *Client) GetLocationAreas(url string) (LocationAreasList, error) {
 		fullURL = url
 	}
 
-	cachedData, ok := c.cache.Get(fullURL)
-	if ok {
-		var locationAreasList LocationAreasList
-		if err := json.Unmarshal(cachedData, &locationAreasList); err != nil {
-			return LocationAreasList{}, err
-		}
-		return locationAreasList, nil
-	}
-
-	res, err := c.client.Get(fullURL)
-	if err != nil {
-		return LocationAreasList{}, err
-	}
-	if res.StatusCode != http.StatusOK {
-		return LocationAreasList{}, fmt.Errorf("unexpected status: %d", res.StatusCode)
-	}
-
-	defer res.Body.Close()
-
-	data, err := io.ReadAll(res.Body)
+	data, err := c.retrieveOrFetch(fullURL)
 	if err != nil {
 		return LocationAreasList{}, err
 	}
@@ -43,6 +19,5 @@ func (c *Client) GetLocationAreas(url string) (LocationAreasList, error) {
 	if err := json.Unmarshal(data, &locationAreasList); err != nil {
 		return LocationAreasList{}, err
 	}
-	c.cache.Add(fullURL, data)
 	return locationAreasList, nil
 }
